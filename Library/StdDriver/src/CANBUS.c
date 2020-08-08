@@ -75,7 +75,7 @@ void CAN0_IRQHandler(void)
     			printf("Checksum Error\n");
     		}
     	}
-    	if (RMSBoardcastRXOBJIDFirst <= Msg_Obj < RMSBoardcastRXOBJIDLast){
+    	if (RMSBoardcastRXOBJIDFirst <= Msg_Obj <= RMSBoardcastRXOBJIDLast){
     	    RMSCANDataUpdate(CANRXMSG);
     	    if (Msg_Obj == 15){
     	    	bool PreErrorFlag = false;
@@ -91,6 +91,13 @@ void CAN0_IRQHandler(void)
     		if(CANRXMSG.Data[2] && (CANRXMSG.Data[0] == 20))
     			printf("Fault Clear Success\n");
     	}
+
+    	if (BMSBoardcastRXOBJIDFirst <= Msg_Obj <= BMSBoardcastRXOBJIDLast){
+    	    BMSCANDataUpdate(CANRXMSG);
+    	}
+    	if (BMSCellRXOBJIDFirst <= Msg_Obj <= BMSCellRXOBJIDLast){
+			BMSCANDataUpdate(CANRXMSG);
+		}
         CAN_CLR_INT_PENDING_BIT(CAN0, ((CAN0->IIDR) -1)); /* Clear Interrupt Pending */
     }
     else if(CAN0->WU_STATUS == 1)
@@ -119,25 +126,19 @@ void CAN0_Init(uint32_t Bit_Rate)
 	CAN_SetRxMsg(CAN0, 0,CAN_STD_ID, 0x0D0);
 
     /* Controller Status parameters */
-    CAN_SetRxMsg(CAN0, 1,CAN_STD_ID, 0x0A0);
-	CAN_SetRxMsg(CAN0, 2,CAN_STD_ID, 0x0A1);
-	CAN_SetRxMsg(CAN0, 3,CAN_STD_ID, 0x0A2);
-	CAN_SetRxMsg(CAN0, 4,CAN_STD_ID, 0x0A3);
-	CAN_SetRxMsg(CAN0, 5,CAN_STD_ID, 0x0A4);
-	CAN_SetRxMsg(CAN0, 6,CAN_STD_ID, 0x0A5);
-	CAN_SetRxMsg(CAN0, 7,CAN_STD_ID, 0x0A6);
-	CAN_SetRxMsg(CAN0, 8,CAN_STD_ID, 0x0A7);
-	CAN_SetRxMsg(CAN0, 9,CAN_STD_ID, 0x0A8);
-	CAN_SetRxMsg(CAN0, 10,CAN_STD_ID, 0x0A9);
-	CAN_SetRxMsg(CAN0, 11,CAN_STD_ID, 0x0AA);
-	CAN_SetRxMsg(CAN0, 12,CAN_STD_ID, 0x0AC);
-	CAN_SetRxMsg(CAN0, 13,CAN_STD_ID, 0x0AD);
-	CAN_SetRxMsg(CAN0, 14,CAN_STD_ID, 0x0AE);
-	CAN_SetRxMsg(CAN0, 15,CAN_STD_ID, 0x0AF);
-	CAN_SetRxMsg(CAN0, 16,CAN_STD_ID, 0x0AB);
+	int i;
+	for(i = RMSBoardcastRXOBJIDFirst; i < RMSBoardcastRXOBJIDLast; i++)
+		CAN_SetRxMsgAndMsk(CAN0, i,CAN_STD_ID, RMSBroadcastRXID, RMSBoradcastMask);
 
 	/* FaultClear Feedback Signal*/
 	CAN_SetRxMsg(CAN0, 17,CAN_STD_ID, 0x0C2);
+
+	/* BMS Status parameters */
+	for(i = BMSBoardcastRXOBJIDFirst; i < BMSBoardcastRXOBJIDLast; i++)
+		CAN_SetRxMsgAndMsk(CAN0, i,CAN_EXT_ID, BMS_HCU_INFO_ID, BMS_HCU_INFOID_MASK);
+	for(i = BMSCellRXOBJIDFirst; i < BMSCellRXOBJIDLast; i++)
+		CAN_SetRxMsgAndMsk(CAN0, i,CAN_EXT_ID, BMS_HCU_CELLV_ID, BMS_HCU_CELLID_MASK);
+
 
     /* CAN interrupt enabled */
     CAN_EnableInt(CAN0, CAN_CON_IE_Msk | CAN_CON_SIE_Msk | CAN_CON_EIE_Msk);

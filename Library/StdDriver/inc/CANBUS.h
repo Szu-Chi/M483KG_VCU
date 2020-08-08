@@ -1,7 +1,7 @@
 /*
  * CAN.h
  *
- *  Created on: 2019¦~12¤ë4¤é
+ *  Created on: 2019ï¿½~12ï¿½ï¿½4ï¿½ï¿½
  *      Author: Eric
  */
 
@@ -13,6 +13,7 @@
 #include "RMS_PM100DX.h"
 #include "SYS_Init.h"
 #include "UART0.h"
+#include "BMS.h"
 
 void CAN0_Init(uint32_t Bit_Rate);
 void CAN0send(uint32_t ID,uint8_t data[8]);

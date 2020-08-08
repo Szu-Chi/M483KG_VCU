@@ -16,7 +16,7 @@
 #define RMSBroadcastRXID    0X00A0
 #define RMSBoradcastMask    0xFFF0
 #define RMSBoardcastRXOBJIDFirst 1
-#define RMSBoardcastRXOBJIDLast  17
+#define RMSBoardcastRXOBJIDLast  16
 
 #define RMSParameterTXID    0X00C1
 #define RMSParameterMask    0xFFFF
